@@ -1,41 +1,44 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# .gitignore - 보안/빌드/캐시 완전 차단
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
+# Secrets - 절대 커밋 금지
+.env
+.env.local
+.env.production
+.env.*.local
 *.pem
+*.key
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
+# Supabase 로컬 개발
+.supabase/
+supabase/.temp/
 
-# env files (can opt-in for committing if needed)
-.env*
+# IDE/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
 
-# vercel
-.vercel
-
-# typescript
+# 빌드/캐시
+.next/
+out/
+dist/
+build/
 *.tsbuildinfo
-next-env.d.ts
+.turbo/
+.vercel/
+
+# 로그/테스트
+*.log
+npm-debug.log*
+pnpm-debug.log*
+coverage/
+.nyc_output/
+
+# Meilisearch 데이터 (로컬용)
+meili_data/
+
+# 타입 생성 산출물 (재생성 가능)
+src/types/supabase.ts
+
+# pnpm
+pnpm-lock.yaml
