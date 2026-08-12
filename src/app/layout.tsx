@@ -8,7 +8,6 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 export const metadata: Metadata = {
   title: 'InfoHub - 나만의 정보 허브',
   description: '개발자/투자자/게이머를 위한 최적화된 정보 대시보드',
-  themeColor: '#0f172a',
 }
 
 export const viewport: Viewport = {
