@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { ChevronDown, ChevronUp, Check } from 'lucide-react'
+import { ChevronDown, Check } from 'lucide-react'
 import { forwardRef } from 'react'
 
 export const Select = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { value?: string; onValueChange?: (value: string) => void }>(
@@ -74,4 +74,5 @@ export const SelectItem = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
 )
 SelectItem.displayName = 'SelectItem'
 
-export const SelectValue = ({ children }: { children: React.ReactNode }) => <span>{children}</span>
+export const SelectValue = ({ children, placeholder }: { children?: React.ReactNode; placeholder?: string }) => 
+  <span>{children ?? placeholder ?? ''}</span>

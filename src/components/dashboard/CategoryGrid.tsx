@@ -4,23 +4,24 @@ import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { 
   Zap, TrendingUp, Target, Newspaper, 
-  Code, BarChart, Gamepad2, FlaskConical,
-  BookOpen, DollarSign, Globe, Shield
+  Code, Server, Layout, FlaskConical,
+  DollarSign, Globe, Shield, Gamepad2,
+  BookOpen, BarChart
 } from 'lucide-react'
 
 const categories = [
-  { id: 'ai', label: 'AI/개발', icon: Zap, color: 'bg-purple-500', count: 24, slug: 'ai' },
-  { id: 'dev', label: '백엔드/인프라', icon: Code, color: 'bg-blue-500', count: 18, slug: 'dev' },
-  { id: 'frontend', label: '프론트엔드', icon: BarChart, color: 'bg-cyan-500', count: 12, slug: 'frontend' },
-  { id: 'workflow', label: '개발 워크플로', icon: FlaskConical, color: 'bg-violet-500', count: 8, slug: 'workflow' },
-  { id: 'startup', label: '창업/수익화', icon: DollarSign, color: 'bg-amber-500', count: 6, slug: 'startup' },
-  { id: 'invest', label: '미국주식/ETF', icon: TrendingUp, color: 'bg-green-500', count: 32, slug: 'invest' },
-  { id: 'macro', label: '매크로/연준', icon: Globe, color: 'bg-teal-500', count: 14, slug: 'macro' },
-  { id: 'realestate', label: '부동산/REIT', icon: Shield, color: 'bg-orange-500', count: 5, slug: 'realestate' },
-  { id: 'game_playing', label: '플레이중 게임', icon: Gamepad2, color: 'bg-pink-500', count: 15, slug: 'game_playing' },
-  { id: 'game_official', label: '공식 채널', icon: BookOpen, color: 'bg-indigo-500', count: 8, slug: 'game_official' },
-  { id: 'news_breaking', label: '실시간 속보', icon: Newspaper, color: 'bg-red-500', count: 12, slug: 'news_breaking' },
-  { id: 'trends', label: '트렌드/이슈', icon: Globe, color: 'bg-slate-500', count: 20, slug: 'trends' },
+  { id: 'ai-dev', label: 'AI·LLM', icon: Zap, color: 'bg-purple-500', count: 24, slug: 'ai-dev', group: 'dev-ai' },
+  { id: 'backend-infra', label: '백엔드·인프라', icon: Server, color: 'bg-blue-500', count: 18, slug: 'backend-infra', group: 'dev-ai' },
+  { id: 'frontend', label: '프론트엔드', icon: Layout, color: 'bg-cyan-500', count: 12, slug: 'frontend', group: 'dev-ai' },
+  { id: 'dev-workflow', label: '개발 워크플로', icon: FlaskConical, color: 'bg-violet-500', count: 8, slug: 'dev-workflow', group: 'dev-ai' },
+  { id: 'startup-revenue', label: '창업·수익화', icon: DollarSign, color: 'bg-amber-500', count: 6, slug: 'startup-revenue', group: 'dev-ai' },
+  { id: 'us-stocks-etf', label: '미국주식·ETF', icon: TrendingUp, color: 'bg-green-500', count: 32, slug: 'us-stocks-etf', group: 'invest' },
+  { id: 'macro-fed', label: '매크로·연준', icon: Globe, color: 'bg-teal-500', count: 14, slug: 'macro-fed', group: 'invest' },
+  { id: 'real-estate', label: '부동산·REIT', icon: Shield, color: 'bg-orange-500', count: 5, slug: 'real-estate', group: 'invest' },
+  { id: 'game-playing', label: '플레이중 게임', icon: Gamepad2, color: 'bg-pink-500', count: 15, slug: 'game-playing', group: 'game' },
+  { id: 'game-official', label: '공식 채널', icon: BookOpen, color: 'bg-indigo-500', count: 8, slug: 'game-official', group: 'game' },
+  { id: 'news-breaking', label: '실시간 속보', icon: Newspaper, color: 'bg-red-500', count: 12, slug: 'news-breaking', group: 'news' },
+  { id: 'trends', label: '트렌드·이슈', icon: Globe, color: 'bg-slate-500', count: 20, slug: 'trends', group: 'news' },
 ]
 
 export function CategoryGrid() {

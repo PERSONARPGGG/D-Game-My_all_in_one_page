@@ -3,30 +3,15 @@
 import { cn } from '@/lib/utils'
 import { ReactNode } from 'react'
 
-interface TooltipProviderProps {
-  children: ReactNode
-}
-
-export function TooltipProvider({ children }: TooltipProviderProps) {
+export function TooltipProvider({ children }: { children: ReactNode }) {
   return <>{children}</>
 }
 
-interface TooltipProps {
-  children: ReactNode
-  side?: 'top' | 'bottom' | 'left' | 'right'
-  className?: string
-}
-
-export function Tooltip({ children, side = 'top', className }: TooltipProps) {
+export function Tooltip({ children, side = 'top', className }: { children: ReactNode; side?: 'top' | 'bottom' | 'left' | 'right'; className?: string }) {
   return <div className={cn('relative inline-block', className)}>{children}</div>
 }
 
-interface TooltipTriggerProps {
-  children: ReactNode
-  asChild?: boolean
-}
-
-export function TooltipTrigger({ children, asChild = false }: TooltipTriggerProps) {
+export function TooltipTrigger({ children, asChild = false }: { children: ReactNode; asChild?: boolean }) {
   if (asChild && typeof children === 'object' && children !== null) {
     return children
   }

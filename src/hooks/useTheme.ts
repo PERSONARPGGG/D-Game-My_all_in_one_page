@@ -4,7 +4,7 @@ export function useTheme() {
   const [theme, setTheme] = useState<'light' | 'dark' | 'amoled' | 'system'>('system')
 
   useEffect(() => {
-    const stored = localStorage.getItem('theme') as typeof theme | null
+    const stored = localStorage.getItem('theme') as 'light' | 'dark' | 'amoled' | 'system' | null
     if (stored) {
       setTheme(stored)
       applyTheme(stored)
@@ -16,7 +16,7 @@ export function useTheme() {
     }
   }, [])
 
-  const applyTheme = (t: typeof theme) => {
+  const applyTheme = (t: 'light' | 'dark' | 'amoled' | 'system') => {
     const root = document.documentElement
     root.classList.remove('light', 'dark', 'amoled')
     if (t === 'system') {
@@ -27,7 +27,7 @@ export function useTheme() {
     }
   }
 
-  const changeTheme = useCallback((newTheme: typeof theme) => {
+  const changeTheme = useCallback((newTheme: 'light' | 'dark' | 'amoled' | 'system') => {
     setTheme(newTheme)
     localStorage.setItem('theme', newTheme)
     applyTheme(newTheme)

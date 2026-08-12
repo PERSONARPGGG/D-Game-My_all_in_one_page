@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils'
 import { forwardRef } from 'react'
 
-export const Switch = forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
+export const Switch = forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement> & { checked?: boolean; onCheckedChange?: (checked: boolean) => void }>(
   ({ className, checked, onCheckedChange, disabled, ...props }, ref) => {
     return (
       <button

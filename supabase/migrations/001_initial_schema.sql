@@ -21,7 +21,7 @@ create table if not exists sources (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) on delete cascade,
   name text not null,
-  type text not null check (type in ('rss','api','scraper','manual','reddit','dcinside')),
+  type text not null check (type in ('rss','api','scraper','manual','reddit','dcinside','official')),
   url text,
   config jsonb default '{}',
   category_id uuid references categories(id) on delete set null,
@@ -46,12 +46,14 @@ create table if not exists articles (
   author text,
   published_at timestamptz,
   fetched_at timestamptz default now(),
+  -- AI 인리치먼트
   ai_summary text,
   ai_tags text[],
   ai_actions jsonb default '[]',
   ai_importance int default 3 check (ai_importance between 1 and 5),
   ai_category_slug text,
   raw_data jsonb default '{}',
+  -- 메타
   is_breaking boolean default false,
   is_read boolean default false,
   is_bookmarked boolean default false,
@@ -71,7 +73,7 @@ create table if not exists user_preferences (
   keywords jsonb default '[]',
   briefing_time_morning time default '07:00',
   briefing_time_evening time default '21:00',
-  notification_settings jsonb default '{"breaking":true,"daily":true,"keywords":true}',
+  notification_settings jsonb default '{"breaking":true,"daily":true,"keywords":true,"gamePatch":true,"gameEvent":true,"gameCoupon":true}',
   theme text default 'system' check (theme in ('light','dark','amoled','system')),
   tone text default 'manager' check (tone in ('brother','manager','senior','entj')),
   created_at timestamptz default now(),
@@ -120,7 +122,7 @@ create table if not exists daily_reports (
   unique(user_id, date)
 );
 
--- 8. 구독 관리
+-- 8. 구독 관리 (사용자별 소스 구독)
 create table if not exists subscriptions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) on delete cascade,
@@ -253,6 +255,7 @@ alter table game_patches enable row level security;
 alter table game_events enable row level security;
 alter table game_coupons enable row level security;
 
+-- Policies: 본인 데이터만 접근
 create policy "own_data" on categories for all using (auth.uid() = user_id);
 create policy "own_data" on sources for all using (auth.uid() = user_id);
 create policy "own_data" on articles for all using (

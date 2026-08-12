@@ -18,6 +18,9 @@ supabase/.temp/
 .DS_Store
 Thumbs.db
 
+# Node
+node_modules/
+
 # 빌드/캐시
 .next/
 out/
@@ -34,11 +37,5 @@ pnpm-debug.log*
 coverage/
 .nyc_output/
 
-# Meilisearch 데이터 (로컬용)
-meili_data/
-
 # 타입 생성 산출물 (재생성 가능)
 src/types/supabase.ts
-
-# pnpm
-pnpm-lock.yaml

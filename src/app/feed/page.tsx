@@ -1,14 +1,19 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
-import { X, ChevronDown, ChevronUp, Search, Filter, MoreHorizontal } from 'lucide-react'
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { 
+  Search, Filter, ChevronDown, MoreHorizontal, 
+  ExternalLink, Bookmark, Check, Eye,
+  ChevronUp, ChevronDown as ChevronDownIcon,
+} from 'lucide-react'
+import { formatRelativeTime } from '@/lib/utils'
 
 interface Article {
   id: string
@@ -21,9 +26,11 @@ interface Article {
   importance: number
   isBreaking: boolean
   isRead: boolean
+  isBookmarked?: boolean
   aiSummary?: string
   aiTags?: string[]
   aiActions?: string[]
+  url: string
 }
 
 const MOCK_ARTICLES: Article[] = [
@@ -41,6 +48,7 @@ const MOCK_ARTICLES: Article[] = [
     aiSummary: '클로드 3.5 소넷이 코딩 벤치마크에서 49% 달성. 함수 호출과 장문 처리 대폭 개선.',
     aiTags: ['클로드', '코딩', 'AI모델', '업데이트'],
     aiActions: ['새 모델 테스트', '기존 프롬프트 마이그레이션 체크'],
+    url: 'https://anthropic.com/news/claude-3-5-sonnet',
   },
   {
     id: '2',
@@ -56,6 +64,7 @@ const MOCK_ARTICLES: Article[] = [
     aiSummary: '연준 금리 동결 우세. 달러 강세, 9월 인하 확률 하락.',
     aiTags: ['연준', '금리', 'FOMC', '달러'],
     aiActions: ['포트폴리오 리밸런싱 검토', '현금 비중 15% 유지'],
+    url: 'https://bloomberg.com/markets/rates-bonds',
   },
   {
     id: '3',
@@ -71,6 +80,7 @@ const MOCK_ARTICLES: Article[] = [
     aiSummary: '페르소나 5 팬텀X 마코토 픽업 시작. 요한나 페르소나 추가.',
     aiTags: ['페르소나', '가챠', '이벤트'],
     aiActions: ['일일 미션 완료', '50연차 모아두기'],
+    url: 'https://p5x.com/notice',
   },
   {
     id: '4',
@@ -86,6 +96,7 @@ const MOCK_ARTICLES: Article[] = [
     aiSummary: '로컬 네모트론 3 울트라 4bit 8토큰/초 달성. RTX 3090 단일 카드.',
     aiTags: ['로컬LLM', '네모트론', '양자화', '엔비디아'],
     aiActions: ['올라마로 다운로드', '로컬 코딩 어시스턴트 구성'],
+    url: 'https://nvidia.com/research/nemotron',
   },
   {
     id: '5',
@@ -101,18 +112,19 @@ const MOCK_ARTICLES: Article[] = [
     aiSummary: '엔비디아 매출 122% 증가. 블랙웰 수요 강력. 가이던스 상향.',
     aiTags: ['엔비디아', '실적', '블랙웰', 'AI칩'],
     aiActions: ['보유 수량 확인', '목표가 $150 유지'],
+    url: 'https://investor.nvidia.com/',
   },
 ]
 
 const CATEGORIES = [
   { id: 'all', label: '전체', color: 'bg-slate-500' },
-  { id: 'ai', label: 'AI/개발', color: 'bg-purple-500' },
-  { id: 'invest', label: '투자', color: 'bg-green-500' },
-  { id: 'game', label: '게임', color: 'bg-pink-500' },
-  { id: 'news', label: '뉴스', color: 'bg-red-500' },
+  { id: 'ai-dev', label: 'AI·LLM', color: 'bg-purple-500' },
+  { id: 'us-stocks-etf', label: '미국주식·ETF', color: 'bg-green-500' },
+  { id: 'game-playing', label: '플레이중 게임', color: 'bg-pink-500' },
+  { id: 'news-breaking', label: '뉴스', color: 'bg-red-500' },
 ]
 
-export function FeedPage() {
+export default function FeedPage() {
   const [activeCategory, setActiveCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<'latest' | 'importance' | 'unread'>('latest')
@@ -120,8 +132,7 @@ export function FeedPage() {
 
   const filteredArticles = MOCK_ARTICLES.filter((article) => {
     if (activeCategory !== 'all') {
-      const catMap: Record<string, string> = { ai: 'AI/개발', invest: '투자', game: '게임', news: '뉴스' }
-      if (article.category !== catMap[activeCategory]) return false
+      if (article.category !== activeCategory) return false
     }
     if (searchQuery && !article.title.toLowerCase().includes(searchQuery.toLowerCase()) && 
         !article.summary.toLowerCase().includes(searchQuery.toLowerCase())) return false
@@ -144,7 +155,7 @@ export function FeedPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="검색..."
+              placeholder="제목, 요약, 내용 검색..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 pr-4 py-2 border rounded-lg bg-background w-64 md:w-80 text-sm"
@@ -223,19 +234,15 @@ function ArticleCard({ article, compact }: { article: Article; compact: boolean 
   if (compact) {
     return (
       <div
-        className={cn(
-          'p-3 rounded-lg border hover:bg-accent/50 transition-colors cursor-pointer',
-          article.isRead && 'opacity-60',
-          article.isBreaking && 'border-destructive/30 bg-destructive/5'
-        )}
+        className={`p-3 rounded-lg border hover:bg-accent/50 transition-colors cursor-pointer ${article.isRead ? 'opacity-60' : ''} ${article.isBreaking ? 'border-destructive/30 bg-destructive/5' : ''}`}
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-start gap-3">
-          <span className={cn('h-2 w-2 rounded-full mt-1.5 shrink-0', article.categoryColor)} />
+          <span className={`h-2 w-2 rounded-full mt-1.5 shrink-0 ${article.categoryColor}`} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-muted">{article.category}</span>
-              <span className="text-xs text-muted-foreground">{new Date(article.publishedAt).toLocaleDateString('ko-KR')}</span>
+              <span className="text-xs text-muted-foreground">{formatRelativeTime(article.publishedAt)}</span>
               {article.isBreaking && <span className="text-xs px-1.5 py-0.5 rounded bg-destructive/10 text-destructive">긴급</span>}
               {[...Array(article.importance)].map((_, i) => <span key={i} className="text-yellow-500 text-xs">★</span>)}
             </div>
@@ -249,20 +256,16 @@ function ArticleCard({ article, compact }: { article: Article; compact: boolean 
 
   return (
     <Card
-      className={cn(
-        'overflow-hidden transition-all',
-        article.isRead && 'opacity-70',
-        article.isBreaking && 'border-destructive/30 bg-destructive/5'
-      )}
+      className={`overflow-hidden transition-all ${article.isRead ? 'opacity-70' : ''} ${article.isBreaking ? 'border-destructive/30 bg-destructive/5' : ''}`}
     >
       <CardContent className="p-4 pt-0">
         <div className="flex items-start gap-3">
-          <span className={cn('h-2 w-2 rounded-full mt-1.5 shrink-0', article.categoryColor)} />
+          <span className={`h-2 w-2 rounded-full mt-1.5 shrink-0 ${article.categoryColor}`} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
               <span className="text-xs font-medium px-2 py-0.5 rounded bg-muted">{article.category}</span>
               <span className="text-xs text-muted-foreground">{article.source}</span>
-              <span className="text-xs text-muted-foreground">{new Date(article.publishedAt).toLocaleString('ko-KR')}</span>
+              <span className="text-xs text-muted-foreground">{formatRelativeTime(article.publishedAt)}</span>
               {article.isBreaking && <span className="text-xs px-2 py-0.5 rounded bg-destructive/10 text-destructive animate-pulse">🔴 긴급</span>}
               {[...Array(article.importance)].map((_, i) => <span key={i} className="text-yellow-500 text-xs">★</span>)}
             </div>
@@ -271,30 +274,38 @@ function ArticleCard({ article, compact }: { article: Article; compact: boolean 
             
             <div className="flex flex-wrap gap-2 mb-3">
               {(article.aiTags || []).map((tag, i) => (
-                <Badge key={i} variant="secondary" className="text-xs">{tag}</Badge>
+                <span key={i} className="px-2 py-0.5 text-xs bg-primary/10 text-primary rounded-full">
+                  {tag}
+                </span>
               ))}
             </div>
 
             <div className="border-t pt-3">
-              <Button variant="ghost" size="sm" className="mr-2" onClick={() => {}}>
+              <button 
+                className="mr-2 text-sm text-primary hover:underline"
+                onClick={() => {}}
+              >
                 {article.isRead ? '✓ 읽음' : '○ 읽음 처리'}
-              </Button>
-              <Button variant="ghost" size="sm" className="mr-2" onClick={() => {}}>
+              </button>
+              <button className="mr-2 text-sm text-primary hover:underline" onClick={() => {}}>
                 🔖 저장
-              </Button>
-              <Button variant="ghost" size="sm" className="mr-2" onClick={() => setExpanded(!expanded)}>
+              </button>
+              <button className="mr-2 text-sm text-primary hover:underline" onClick={() => setExpanded(!expanded)}>
                 {expanded ? '▲ 접기' : '▼ 상세'}
-              </Button>
+              </button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm">
+                  <button className="text-sm text-muted-foreground hover:text-foreground">
                     <MoreHorizontal className="h-4 w-4" />
-                  </Button>
+                  </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => {}}>하이라이트 추가</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => {}}>액션 아이템으로 추가</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => {}}>공유</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => window.open(article.url, '_blank')}>
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    원문 열기
+                  </DropdownMenuItem>
                   <DropdownMenuItem className="text-destructive" onClick={() => {}}>숨기기</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -313,13 +324,18 @@ function ArticleCard({ article, compact }: { article: Article; compact: boolean 
                     <p className="text-xs font-medium text-primary mb-1">⚡ 추천 액션</p>
                     <div className="flex flex-wrap gap-1">
                       {article.aiActions.map((action, i) => (
-                        <Badge key={i} variant="outline" className="text-xs cursor-pointer" onClick={() => {}}>
+                        <span key={i} className="px-2 py-0.5 text-xs bg-primary/10 text-primary rounded-full cursor-pointer" onClick={() => {}}>
                           + {action}
-                        </Badge>
+                        </span>
                       ))}
                     </div>
                   </div>
                 )}
+                <div className="flex gap-2 pt-2 border-t">
+                  <a href={article.url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                    🔗 원문 사이트로 이동
+                  </a>
+                </div>
               </div>
             )}
           </div>

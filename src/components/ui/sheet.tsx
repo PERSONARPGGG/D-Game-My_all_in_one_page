@@ -3,11 +3,12 @@
 import { cn } from '@/lib/utils'
 import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ReactNode } from 'react'
 
 interface SheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export function Sheet({ open, onOpenChange, children }: SheetProps) {
@@ -22,9 +23,9 @@ export function Sheet({ open, onOpenChange, children }: SheetProps) {
   )
 }
 
-export function SheetTrigger({ children, asChild = false, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { asChild?: boolean }) {
-  if (asChild && typeof children === 'function') {
-    return children({ ...props, onClick: props.onClick })
+export function SheetTrigger({ children, asChild, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { asChild?: boolean }) {
+  if (asChild) {
+    return <>{children}</>
   }
   return <Button {...props}>{children}</Button>
 }
@@ -41,7 +42,6 @@ export function SheetContent({ children, className, side = 'right', ...props }: 
       {...props}
     >
       <div className="flex items-center justify-between p-4 border-b">
-        <slot name="title" />
         <Button variant="ghost" size="icon" onClick={() => {}}>
           <X className="h-5 w-5" />
         </Button>

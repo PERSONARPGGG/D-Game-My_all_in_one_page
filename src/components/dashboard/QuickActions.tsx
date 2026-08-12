@@ -2,15 +2,15 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { Plus, Settings, Download, Upload, RefreshCw } from 'lucide-react'
+import { Plus, Settings, Download, Upload, RefreshCw, Zap, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const quickActions = [
-  { label: '새 글 작성', icon: Plus, action: 'write', variant: 'default' },
-  { label: '설정 열기', icon: Settings, action: 'settings', variant: 'outline' },
-  { label: '데이터 내보내기', icon: Download, action: 'export', variant: 'outline' },
-  { label: '백업 가져오기', icon: Upload, action: 'import', variant: 'outline' },
-  { label: '강제 동기화', icon: RefreshCw, action: 'sync', variant: 'ghost' },
+  { label: '새 글 작성', icon: Plus, action: 'write', variant: 'default' as const },
+  { label: '강제 동기화', icon: RefreshCw, action: 'sync', variant: 'outline' as const },
+  { label: 'AI 요약 실행', icon: Zap, action: 'ai-summarize', variant: 'outline' as const },
+  { label: '검색', icon: Search, action: 'search', variant: 'outline' as const },
+  { label: '설정', icon: Settings, action: 'settings', variant: 'ghost' as const },
 ]
 
 export function QuickActions() {
@@ -24,7 +24,7 @@ export function QuickActions() {
           {quickActions.map((action) => (
             <Button
               key={action.action}
-              variant={action.variant as any}
+              variant={action.variant}
               className={cn('h-auto py-3 px-2 gap-1', 'flex flex-col items-center')}
               onClick={() => handleAction(action.action)}
             >
@@ -46,14 +46,14 @@ function handleAction(action: string) {
     case 'settings':
       window.location.href = '/settings'
       break
-    case 'export':
-      alert('데이터 내보내기 (구현 예정)')
-      break
-    case 'import':
-      alert('백업 가져오기 (구현 예정)')
-      break
     case 'sync':
       alert('강제 동기화 실행 (구현 예정)')
+      break
+    case 'ai-summarize':
+      alert('AI 요약 실행 (구현 예정)')
+      break
+    case 'search':
+      window.location.href = '/search'
       break
   }
 }

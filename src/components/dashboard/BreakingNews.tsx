@@ -28,20 +28,17 @@ export function BreakingNews() {
           🔥 실시간 브레이킹
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0">
+      <div className="p-4 pt-0">
         <div className="space-y-2">
           {breakingNews.map((news) => {
             const Icon = categoryIcons[news.category as keyof typeof categoryIcons] || Newspaper
             return (
               <div
                 key={news.id}
-                className={cn(
-                  'p-3 rounded-lg border hover:bg-accent/50 transition-colors cursor-pointer',
-                  news.importance >= 4 && 'border-destructive/30 bg-destructive/5'
-                )}
+                className={`p-3 rounded-lg border hover:bg-accent/50 transition-colors cursor-pointer ${news.importance >= 4 ? 'border-destructive/30 bg-destructive/5' : ''}`}
               >
                 <div className="flex items-start gap-3">
-                  <Icon className={cn('h-5 w-5 shrink-0 mt-0.5', news.importance >= 4 ? 'text-destructive' : 'text-primary')} />
+                  <Icon className={`h-5 w-5 shrink-0 mt-0.5 ${news.importance >= 4 ? 'text-destructive' : 'text-primary'}`} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xs font-medium px-2 py-0.5 rounded bg-muted">
@@ -49,7 +46,7 @@ export function BreakingNews() {
                       </span>
                       <span className="text-xs text-muted-foreground">{news.time}</span>
                       {[...Array(news.importance)].map((_, i) => (
-                        <span key={i} className={cn('text-xs', news.importance >= 4 ? 'text-destructive' : 'text-yellow-500')}>★</span>
+                        <span key={i} className={news.importance >= 4 ? 'text-destructive' : 'text-yellow-500'} text-xs>★</span>
                       ))}
                     </div>
                     <p className="text-sm font-medium line-clamp-1">{news.title}</p>
@@ -59,7 +56,7 @@ export function BreakingNews() {
             )
           })}
         </div>
-      </CardContent>
+      </div>
     </Card>
   )
 }

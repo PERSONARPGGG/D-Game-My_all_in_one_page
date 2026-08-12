@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -32,18 +33,85 @@ const EVENING_SECTIONS = [
   { id: 'preview', label: '내일 미리보기', icon: BookOpen, color: 'text-indigo-500' },
 ]
 
-export function BriefingPage() {
+const MORNING_ITEMS = {
+  core: [
+    { title: 'Claude 3.5 Sonnet 코딩 성능 15% 향상', category: 'AI/개발', importance: 5, url: '#' },
+    { title: '연준 금리 동결 전망 - 9월 인하 확률 35%', category: '투자', importance: 4, url: '#' },
+    { title: '페르소나 5 팬텀X 마코토 픽업 시작', category: '게임', importance: 3, url: '#' },
+  ],
+  actions: [
+    { title: '네모트론 3 울트라 로컬 테스트', category: 'AI/개발', done: false },
+    { title: '포트폴리오 리밸런싱 검토', category: '투자', done: true },
+    { title: '페르소나 일일 미션 완료', category: '게임', done: false },
+  ],
+  ai: [
+    { title: 'Nemotron 3 Ultra 4bit 8tok/s 달성', category: 'AI/개발', importance: 5, url: '#' },
+    { title: '로컬 LLM 올라마 설정 가이드', category: '워크플로', importance: 4, url: '#' },
+    { title: 'AI 코딩 에이전트 비교: Cursor vs Cline', category: '워크플로', importance: 3, url: '#' },
+  ],
+  breaking: [
+    { title: '엔비디아 실적 서프라이즈 - 주가 +6%', category: '투자', importance: 5, url: '#' },
+    { title: '오픈AI o1-preview 공식 출시', category: 'AI/개발', importance: 4, url: '#' },
+  ],
+  invest: [
+    { title: '보유 종목: NVDA +4.2%, QQQ +1.1%', category: '포트폴리오', importance: 3, url: '#' },
+    { title: '배당 캘린더: 다음 주 AAPL 배당락', category: '배당', importance: 2, url: '#' },
+  ],
+  game: [
+    { title: '메타포 리판타지오 10/11 출시 확정', category: '게임', importance: 4, url: '#' },
+    { title: '페르소나 5 팬텀X 벨벳 룸 이벤트', category: '게임', importance: 3, url: '#' },
+  ],
+  routine: [
+    { title: '아침 스트레칭 10분', category: '건강', done: true },
+    { title: '물 500ml 마시기', category: '건강', done: false },
+    { title: '일일 계획 검토 5분', category: '생산성', done: true },
+  ],
+}
+
+const EVENING_ITEMS = {
+  core: [
+    { title: 'Nemotron 3 Ultra 4bit 8tok/s 달성', category: 'AI/개발', importance: 5, url: '#' },
+    { title: '엔비디아 실적 서프라이즈 - 주가 +6%', category: '투자', importance: 5, url: '#' },
+    { title: '오픈AI o1-preview 공식 출시', category: 'AI/개발', importance: 4, url: '#' },
+  ],
+  actions: [
+    { title: '네모트론 3 울트라 로컬 테스트', category: 'AI/개발', done: true },
+    { title: '포트폴리오 리밸런싱 완료', category: '투자', done: true },
+    { title: '페르소나 일일 미션 완료', category: '게임', done: true },
+  ],
+  ai: [
+    { title: '로컬 LLM 신기록 - 4bit 양자화로 8tok/s', category: 'AI/개발', importance: 5, url: '#' },
+    { title: 'AI 코딩 에이전트 실전 비교', category: '워크플로', importance: 4, url: '#' },
+  ],
+  breaking: [
+    { title: '비트코인 $65K 돌파 - ETF 순유입 기록', category: '투자', importance: 4, url: '#' },
+  ],
+  invest: [
+    { title: '포트폴리오 일일 수익 +2.3%', category: '포트폴리오', importance: 3, url: '#' },
+  ],
+  game: [
+    { title: '페르소나 5 팬텀X 벨벳 룸 이벤트 종료 임박', category: '게임', importance: 3, url: '#' },
+  ],
+  preview: [
+    { title: '내일 FOMC 회의 - 금리 결정', category: '투자', importance: 5, url: '#' },
+    { title: '애플 신제품 발표 이벤트', category: '기술', importance: 3, url: '#' },
+  ],
+}
+
+export default function BriefingPage() {
   const [activeTab, setActiveTab] = useState<'morning' | 'evening' | 'custom'>('morning')
   const [customSections, setCustomSections] = useState(MORNING_SECTIONS.map(s => s.id))
 
   const sections = activeTab === 'morning' ? MORNING_SECTIONS : activeTab === 'evening' ? EVENING_SECTIONS : 
     MORNING_SECTIONS.filter(s => customSections.includes(s.id))
 
+  const itemsMap = activeTab === 'evening' ? EVENING_ITEMS : MORNING_ITEMS
+
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-4xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">브리핑</h1>
+          <h1 className="text-2xl font-bold">오늘의 브리핑</h1>
           <p className="text-muted-foreground text-sm">
             {activeTab === 'morning' ? '🌅 아침 브리핑' : activeTab === 'evening' ? '🌙 저녁 브리핑' : '⚙️ 커스텀 브리핑'}
           </p>
@@ -92,7 +160,7 @@ export function BriefingPage() {
 
       <div className="space-y-4">
         {sections.map((section) => (
-          <BriefingSection key={section.id} section={section} />
+          <BriefingSection key={section.id} section={section} items={(itemsMap as Record<string, any>)[section.id] || []} />
         ))}
       </div>
 
@@ -108,50 +176,9 @@ export function BriefingPage() {
   )
 }
 
-function BriefingSection({ section }: { section: typeof MORNING_SECTIONS[0] }) {
+function BriefingSection({ section, items }: { section: typeof MORNING_SECTIONS[0]; items: any[] }) {
   const [expanded, setExpanded] = useState(true)
   const Icon = section.icon
-
-  const mockItems = {
-    core: [
-      { title: 'Claude 3.5 Sonnet 코딩 성능 15% 향상', category: 'AI/개발', importance: 5 },
-      { title: '연준 금리 동결 전망 - 9월 인하 확률 35%', category: '투자', importance: 4 },
-      { title: '페르소나 5 팬텀X 마코토 픽업 시작', category: '게임', importance: 3 },
-    ],
-    actions: [
-      { title: '네모트론 3 울트라 로컬 테스트', category: 'AI/개발', done: false },
-      { title: '포트폴리오 리밸런싱 검토', category: '투자', done: true },
-      { title: '페르소나 일일 미션 완료', category: '게임', done: false },
-    ],
-    ai: [
-      { title: 'Nemotron 3 Ultra 4bit 8tok/s 달성', category: 'AI/개발', importance: 5 },
-      { title: '로컬 LLM 올라마 설정 가이드', category: '워크플로', importance: 4 },
-      { title: 'AI 코딩 에이전트 비교: Cursor vs Cline', category: '워크플로', importance: 3 },
-    ],
-    breaking: [
-      { title: '엔비디아 실적 서프라이즈 - 주가 +6%', category: '투자', importance: 5 },
-      { title: '오픈AI o1-preview 공식 출시', category: 'AI/개발', importance: 4 },
-    ],
-    invest: [
-      { title: '보유 종목: NVDA +4.2%, QQQ +1.1%', category: '포트폴리오', importance: 3 },
-      { title: '배당 캘린더: 다음 주 AAPL 배당락', category: '배당', importance: 2 },
-    ],
-    game: [
-      { title: '메타포 리판타지오 10/11 출시 확정', category: '게임', importance: 4 },
-      { title: '페르소나 5 팬텀X 벨벳 룸 이벤트', category: '게임', importance: 3 },
-    ],
-    routine: [
-      { title: '아침 스트레칭 10분', category: '건강', done: true },
-      { title: '물 500ml 마시기', category: '건강', done: false },
-      { title: '일일 계획 검토 5분', category: '생산성', done: true },
-    ],
-    preview: [
-      { title: '내일 FOMC 회의 - 금리 결정', category: '투자', importance: 5 },
-      { title: '애플 신제품 발표 이벤트', category: '기술', importance: 3 },
-    ],
-  }
-
-  const items = mockItems[section.id as keyof typeof mockItems] || []
 
   return (
     <Card className={cn('overflow-hidden', !expanded && 'h-auto')}>
@@ -208,5 +235,3 @@ function BriefingSection({ section }: { section: typeof MORNING_SECTIONS[0] }) {
     </Card>
   )
 }
-
-import { useState } from 'react'

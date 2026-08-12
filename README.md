@@ -1,25 +1,27 @@
-# My Info Hub - 나만의 정보 허브
+# InfoHub - 나만의 정보 허브
 
-개인용 최적화 정보 대시보드. 인스타/쇼츠 시간 줄이고 원하는 정보만 모아보는 페이지.
+개발자/투자자/게이머를 위한 최적화된 정보 대시보드. 인스타/쇼츠 시간 줄이고 원하는 정보만 모아보는 페이지.
 
 ## 🚀 기술 스택
+
 - **Frontend**: Next.js 14 (App Router) + TypeScript + Tailwind CSS
-- **UI**: shadcn/ui (Radix Primitives) + Lucide Icons
+- **UI**: shadcn/ui 스타일 컴포넌트 + Lucide Icons
 - **State**: TanStack Query + Zustand
 - **Backend**: Supabase (PostgreSQL + Auth + Realtime + Edge Functions)
 - **Deploy**: Vercel + Supabase
-- **PWA**: next-pwa (Workbox)
+- **Data Pipeline**: RSS/Reddit/DCInside/Official API + AI 요약 (Nemotron/Gemini/OpenRouter/Local 폴백)
 
 ## 📋 주요 기능
-- 🌅 **아침/저녁 브리핑** - 카테고리별 핵심 3개 + 액션 아이템
-- 📰 **실시간 피드** - 카테고리 탭 + 무한스크롤 + 필터/검색
-- 🤖 **AI 요약/분류** - Nemotron/Gemini/OpenRouter 폴백 체인 + 로컬 폴백
+
+- 🌅 **오늘의 브리핑** - 아침/저녁/커스텀, 5개 핵심 카드, 실시간 클릭→상세/원문링크
+- 📰 **피드** - 카테고리 탭, 검색/정렬/필터, 무한스크롤, 카드/컴팩트 뷰
+- 🤖 **AI 요약/분류** - Nemotron → Gemini → OpenRouter → 로컬(TF-IDF) 폴백 체인
 - 💰 **포트폴리오** - 토스증권 스타일 티커 카드 + 실적/배당/알림
-- 🎮 **게임 트래킹** - 패치/이벤트/쿠폰/서버상태 실시간
+- 🎮 **게임 트래킹** - 아크레이더스/더파이널스/페르소나5 팬텀X/카스온라인/DJMAX/테스트바 히어로 + 공식/커뮤니티 소스
 - 📝 **하이라이트/메모** - 롱프레스 선택 + 태그 + 검색
 - ✅ **액션 트래커** - 실천 체크 + 스트릭 + 주간 리포트
 - 🔍 **통합 검색** - Meilisearch/Postgres FTS 풀텍스트
-- 🌙 **다크모드/아몰레드/시스템** + 4가지 알림 톤
+- 🌙 **테마** - 라이트/다크/아몰레드/시스템 + 4가지 알림 톤
 
 ## 🛠 개발 환경 설정
 
@@ -57,21 +59,25 @@ src/
 ├── app/                    # Next.js App Router 페이지
 │   ├── (dashboard)/        # 대시보드 레이아웃 그룹
 │   │   ├── page.tsx        # 메인 대시보드
-│   │   ├── feed/           # 피드 페이지
 │   │   ├── briefing/       # 브리핑 페이지
+│   │   ├── feed/           # 피드 페이지
+│   │   ├── search/         # 검색 페이지
 │   │   └── settings/       # 설정 페이지
 │   ├── api/                # API 라우트
 │   ├── globals.css         # 전역 스타일 + CSS 변수
 │   ├── layout.tsx          # 루트 레이아웃
-│   └── providers.tsx       # React Query/Session Provider
+│   └── providers.tsx       # React Query Provider
 ├── components/
-│   ├── ui/                 # shadcn/ui 기본 컴포넌트
-│   ├── layout/             # 레이아웃 컴포넌트 (탭바, 드로어)
+│   ├── ui/                 # 기본 UI 컴포넌트
+│   ├── layout/             # 레이아웃 컴포넌트 (탭바/드로어)
 │   └── dashboard/          # 대시보드 전용 컴포넌트
 ├── hooks/                  # 커스텀 훅 (useTheme, useOffline 등)
 ├── lib/
 │   ├── supabase/           # Supabase 클라이언트 (client/server/middleware)
-│   └── utils.ts            # cn() 등 유틸리티
+│   ├── fetchers/           # RSS/Reddit/DCInside/Official/API 페처
+│   ├── ai/                 # AI 요약 (Nemotron/Gemini/OpenRouter/Local)
+│   └── pipeline/           # 데이터 파이프라인 오케스트레이터
+├── config/                 # 설정 (카테고리 등)
 ├── types/                  # TypeScript 타입 정의
 └── middleware.ts           # Next.js 미들웨어 (세션 갱신)
 supabase/
@@ -86,9 +92,6 @@ supabase/
 ## 📱 PWA 설치
 - 모바일에서 "홈 화면에 추가"로 앱처럼 사용
 - 오프라인에서 마지막 동기화된 콘텐츠 읽기 가능
-
-## 🤝 기여
-개인 프로젝트지만 이슈/PR 환영합니다.
 
 ## 📄 라이선스
 MIT

@@ -9,7 +9,6 @@ export function useOffline() {
       setIsOnline(true)
       if (wasOffline) {
         setWasOffline(false)
-        // 동기화 트리거
         window.dispatchEvent(new CustomEvent('app:sync'))
       }
     }

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -11,10 +12,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { 
   User, Bell, Palette, Zap, Database, 
   Key, Shield, Moon, Sun, Monitor, Smartphone,
-  Plus, Trash2, Edit, Download, Upload, RefreshCw
+  Plus, Trash2, Edit, Download, Upload, RefreshCw,
+  TrendingUp, Newspaper, Check, TestTube2,
 } from 'lucide-react'
+import { useTheme } from '@/hooks/useTheme'
 
-export function SettingsPage() {
+export default function SettingsPage() {
+  const { theme, setTheme } = useTheme()
+  const [tone, setTone] = useState<'manager' | 'brother' | 'senior' | 'entj'>('manager')
+
   return (
     <div className="p-4 md:p-6 max-w-4xl mx-auto space-y-6">
       <h1 className="text-2xl font-bold">설정</h1>
@@ -84,22 +90,23 @@ export function SettingsPage() {
               <div>
                 <Label>테마 모드</Label>
                 <div className="grid grid-cols-4 gap-3 mt-2">
-                  {['light', 'dark', 'amoled', 'system'].map((theme) => (
+                  {[
+                    { value: 'light', label: '라이트', icon: Sun, desc: '밝은 배경' },
+                    { value: 'dark', label: '다크', icon: Moon, desc: '어두운 배경' },
+                    { value: 'amoled', label: '아몰레드', icon: Monitor, desc: '완전 검은 배경 (OLED 절전)' },
+                    { value: 'system', label: '시스템', icon: Smartphone, desc: 'OS 설정 따라감' },
+                  ].map((t) => (
                     <button
-                      key={theme}
+                      key={t.value}
+                      onClick={() => setTheme(t.value as 'light' | 'dark' | 'amoled' | 'system')}
                       className={cn(
                         'p-4 rounded-lg border-2 text-center transition-all',
-                        theme === 'light' && 'border-slate-300 bg-white',
-                        theme === 'dark' && 'border-slate-700 bg-slate-900 text-white',
-                        theme === 'amoled' && 'border-slate-900 bg-black text-white',
-                        theme === 'system' && 'border-blue-500 bg-blue-50'
+                        theme === t.value && 'border-primary bg-primary/10'
                       )}
                     >
-                      {theme === 'light' && <Sun className="h-6 w-6 mx-auto mb-1" />}
-                      {theme === 'dark' && <Moon className="h-6 w-6 mx-auto mb-1" />}
-                      {theme === 'amoled' && <Monitor className="h-6 w-6 mx-auto mb-1" />}
-                      {theme === 'system' && <Smartphone className="h-6 w-6 mx-auto mb-1" />}
-                      <div className="text-sm font-medium">{theme}</div>
+                      <t.icon className="h-6 w-6 mx-auto mb-1" />
+                      <div className="text-sm font-medium">{t.label}</div>
+                      <div className="text-xs text-muted-foreground">{t.desc}</div>
                     </button>
                   ))}
                 </div>
@@ -107,18 +114,23 @@ export function SettingsPage() {
               <div>
                 <Label>알림 톤</Label>
                 <div className="grid grid-cols-4 gap-3 mt-2">
-                  {['manager', 'brother', 'senior', 'entj'].map((tone) => (
+                  {[
+                    { value: 'manager', label: '매니저', emoji: '👔', desc: '전문적이고 정중한 존댓말' },
+                    { value: 'brother', label: '형/누나', emoji: '🤝', desc: '친근한 반말' },
+                    { value: 'senior', label: '선배', emoji: '👨‍🏫', desc: '조언조 반말' },
+                    { value: 'entj', label: 'ENTJ 팩폭', emoji: '⚡', desc: '직설적이고 효율성 중시' },
+                  ].map((t) => (
                     <button
-                      key={tone}
-                      className="p-4 rounded-lg border-2 text-center hover:bg-accent"
+                      key={t.value}
+                      onClick={() => setTone(t.value as 'manager' | 'brother' | 'senior' | 'entj')}
+                      className={cn(
+                        'p-4 rounded-lg border-2 text-center hover:bg-accent',
+                        tone === t.value && 'border-primary bg-primary/10'
+                      )}
                     >
-                      <div className="text-lg mb-1">
-                        {tone === 'manager' && '👔'}
-                        {tone === 'brother' && '🤝'}
-                        {tone === 'senior' && '👨‍🏫'}
-                        {tone === 'entj' && '⚡'}
-                      </div>
-                      <div className="text-sm font-medium">{tone}</div>
+                      <div className="text-2xl mb-1">{t.emoji}</div>
+                      <div className="text-sm font-medium">{t.label}</div>
+                      <div className="text-xs text-muted-foreground">{t.desc}</div>
                     </button>
                   ))}
                 </div>
@@ -131,41 +143,24 @@ export function SettingsPage() {
           <Card>
             <CardHeader><CardTitle>🔔 알림 설정</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">브레이킹 뉴스 즉시 알림</p>
-                  <p className="text-sm text-muted-foreground">중요도 5점 만점 5점인 긴급 뉴스</p>
+              {[
+                { id: 'breaking', label: '브레이킹 뉴스 즉시 알림', desc: '중요도 5점 만점 5점인 긴급 뉴스', default: true },
+                { id: 'morning', label: '아침 브리핑', desc: '매일 오전 07:00 발송', default: true },
+                { id: 'evening', label: '저녁 브리핑', desc: '매일 오후 21:00 발송', default: true },
+                { id: 'keywords', label: '키워드 알림', desc: '설정한 키워드 매칭 시', default: true },
+                { id: 'weekly', label: '주간 리포트', desc: '매주 일요일 오전 09:00 발송', default: true },
+                { id: 'gamePatch', label: '게임 패치 알림', desc: '플레이중 게임 패치/업데이트', default: true },
+                { id: 'gameEvent', label: '게임 이벤트 알림', desc: '게임 이벤트 시작/종료', default: true },
+                { id: 'gameCoupon', label: '게임 쿠폰 알림', desc: '새 쿠폰 코드 발견 시', default: true },
+              ].map(({ id, label, desc, default: def }) => (
+                <div key={id} className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">{label}</p>
+                    <p className="text-sm text-muted-foreground">{desc}</p>
+                  </div>
+                  <Switch defaultChecked={def} />
                 </div>
-                <Switch defaultChecked />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">아침 브리핑</p>
-                  <p className="text-sm text-muted-foreground">매일 오전 07:00 발송</p>
-                </div>
-                <Switch defaultChecked />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">저녁 브리핑</p>
-                  <p className="text-sm text-muted-foreground">매일 오후 21:00 발송</p>
-                </div>
-                <Switch defaultChecked />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">키워드 알림</p>
-                  <p className="text-sm text-muted-foreground">설정한 키워드 매칭 시</p>
-                </div>
-                <Switch defaultChecked />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">주간 리포트</p>
-                  <p className="text-sm text-muted-foreground">매주 일요일 오전 09:00 발송</p>
-                </div>
-                <Switch defaultChecked />
-              </div>
+              ))}
             </CardContent>
           </Card>
         </TabsContent>
@@ -175,27 +170,30 @@ export function SettingsPage() {
             <CardHeader><CardTitle>🔑 API 키 관리</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                키는 암호화되어 저장됩니다. 브라우저에서만 사용되며 서버로 전송되지 않습니다.
+                키는 로컬(localStorage)에만 저장되며 서버로 전송되지 않습니다. 브라우저를 닫아도 유지됩니다.
               </p>
               {[
-                { key: 'NVIDIA_API_KEY', label: 'NVIDIA Nemotron 3 Ultra', icon: Zap },
-                { key: 'GOOGLE_AI_API_KEY', label: 'Google Gemini 1.5 Flash', icon: Zap },
-                { key: 'OPENROUTER_API_KEY', label: 'OpenRouter (무료 모델)', icon: Zap },
-                { key: 'ALPHA_VANTAGE_API_KEY', label: 'Alpha Vantage (주식 데이터)', icon: TrendingUp },
-                { key: 'NEWS_API_KEY', label: 'News API (뉴스 데이터)', icon: Newspaper },
-              ].map(({ key, label, icon }) => (
+                { key: 'NVIDIA_API_KEY', label: 'NVIDIA Nemotron 3 Ultra', icon: Zap, desc: '로컬 LLM 요약용 (무료)' },
+                { key: 'GOOGLE_AI_API_KEY', label: 'Google Gemini 1.5 Flash', icon: Zap, desc: '빠른 요약용 (무료)' },
+                { key: 'OPENROUTER_API_KEY', label: 'OpenRouter (무료 모델)', icon: Zap, desc: '다양한 무료 모델 접근' },
+                { key: 'ALPHA_VANTAGE_API_KEY', label: 'Alpha Vantage (주식 데이터)', icon: TrendingUp, desc: '실적/배당/시세 데이터' },
+                { key: 'NEWS_API_KEY', label: 'News API (뉴스 데이터)', icon: Newspaper, desc: '실시간 뉴스 수집' },
+              ].map(({ key, label, icon: Icon, desc }) => (
                 <div key={key} className="flex items-center justify-between p-3 border rounded-lg">
                   <div className="flex items-center gap-3">
-                    <icon className="h-5 w-5 text-primary" />
+                    <Icon className="h-5 w-5 text-primary" />
                     <div>
                       <p className="font-medium">{label}</p>
-                      <p className="text-xs text-muted-foreground">{key}</p>
+                      <p className="text-xs text-muted-foreground">{desc}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Input type="password" placeholder="API 키 입력" className="w-64" />
                     <Button variant="outline" size="sm">저장</Button>
                     <Button variant="ghost" size="sm">삭제</Button>
+                    <Button variant="ghost" size="sm" onClick={() => {}}>
+                      <TestTube2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               ))}
